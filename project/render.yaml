@@ -1,0 +1,23 @@
+# Render Blueprint. project 폴더를 git 저장소 루트로 만들고 GitHub에 올린 뒤,
+# Render 대시보드 > New > Blueprint 에서 이 저장소를 선택하면 자동 배포됩니다.
+databases:
+  - name: face-auth-db
+    plan: free
+
+services:
+  - type: web
+    name: face-auth
+    runtime: python
+    plan: free
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: face-auth-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true     # Render가 무작위 생성
+      - key: ADMIN_KEY
+        sync: false             # 배포 시 직접 입력 (admin_ui.py에 넣을 관리자 키)

@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments (do NOT commit these)
+venv/
+.venv/
+
+# Local SQLite DB (server uses Postgres on Render)
+*.db
+
+# Cached login key on the client machine
+.face_detection_key
+
+# PyInstaller build output (.exe is built locally, not committed)
+build/
+dist/
+*.spec
