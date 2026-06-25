@@ -73,48 +73,96 @@ INDEX_HTML = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>얼굴인식 회원</title>
+<title>얼굴인식</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-  body { font-family: 'Malgun Gothic', sans-serif; max-width: 440px; margin: 36px auto; padding: 0 16px; color: #222; }
-  h1 { text-align: center; }
-  .card { border: 1px solid #ddd; border-radius: 10px; padding: 18px 20px; margin: 18px 0; }
-  .card h2 { margin: 0 0 12px; font-size: 18px; }
-  input { width: 100%; box-sizing: border-box; padding: 10px; margin: 6px 0; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; }
-  button { width: 100%; padding: 11px; font-size: 15px; border: 0; border-radius: 6px; cursor: pointer; }
-  .primary { background: #1976d2; color: #fff; }
-  .ghost { background: #eee; margin-top: 8px; }
-  .msg { font-size: 13px; margin: 8px 0 0; min-height: 18px; }
-  .ok { color: #2e7d32; }
-  .err { color: #c62828; }
-  #key_box { margin-top: 14px; padding: 12px; background: #f1f8e9; border-radius: 8px; }
-  textarea { width: 100%; box-sizing: border-box; font-size: 14px; padding: 8px; border: 1px solid #c5e1a5; border-radius: 6px; resize: none; }
+  :root {
+    --bg: #141517; --card: #1E2023; --input: #26282C; --line: #303338;
+    --text: #EDEEF0; --sub: #8C9099; --accent: #3182F6; --accent-press: #2272EB;
+    --ok: #4ED17F; --err: #FF6B6B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); color: var(--text); padding: 24px;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  }
+  .card { width: 100%; max-width: 380px; background: var(--card); border-radius: 24px; padding: 34px 26px; }
+  .logo { width: 52px; height: 52px; border-radius: 16px; background: var(--accent); display: flex;
+          align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
+  h1 { margin: 0; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+  .desc { text-align: center; color: var(--sub); font-size: 13px; margin: 8px 0 24px; }
+  .tabs { display: flex; background: var(--input); border-radius: 13px; padding: 4px; margin-bottom: 22px; }
+  .tab { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600; color: var(--sub);
+         border-radius: 10px; cursor: pointer; transition: .15s; user-select: none; }
+  .tab.active { background: var(--card); color: var(--text); box-shadow: 0 1px 5px rgba(0,0,0,.35); }
+  form { display: none; }
+  form.active { display: block; }
+  label { display: block; font-size: 12px; color: var(--sub); margin: 0 0 6px 2px; }
+  input { width: 100%; padding: 14px; margin-bottom: 14px; font-size: 15px; color: var(--text);
+          background: var(--input); border: 1px solid transparent; border-radius: 13px; outline: none;
+          transition: .15s; font-family: inherit; }
+  input::placeholder { color: #5C616B; }
+  input:focus { border-color: var(--accent); }
+  .primary { width: 100%; padding: 15px; font-size: 15px; font-weight: 700; color: #fff; background: var(--accent);
+             border: 0; border-radius: 13px; cursor: pointer; transition: .15s; font-family: inherit; }
+  .primary:hover { background: var(--accent-press); }
+  .primary:active { transform: scale(.99); }
+  .msg { font-size: 13px; margin: 13px 2px 0; min-height: 18px; text-align: center; }
+  .ok { color: var(--ok); }
+  .err { color: var(--err); }
+  #key_box { margin-top: 18px; padding: 16px; background: var(--input); border-radius: 16px; }
+  #key_box .lbl { font-size: 13px; color: var(--sub); margin-bottom: 9px; }
+  textarea { width: 100%; font-family: Consolas, 'SFMono-Regular', monospace; font-size: 13px; color: var(--text);
+             background: var(--bg); padding: 11px; border: 1px solid var(--line); border-radius: 11px; resize: none; outline: none; }
+  .ghost { width: 100%; margin-top: 10px; padding: 12px; font-size: 14px; font-weight: 600; color: var(--accent);
+           background: transparent; border: 1px solid var(--accent); border-radius: 12px; cursor: pointer; font-family: inherit; }
+  .ghost:active { background: rgba(49,130,246,.12); }
 </style>
 </head>
 <body>
-  <h1>얼굴인식 회원</h1>
-
   <div class="card">
-    <h2>회원가입</h2>
-    <input id="r_email" placeholder="이메일" autocomplete="off">
-    <input id="r_pw" type="password" placeholder="비밀번호">
-    <button class="primary" onclick="doRegister()">회원가입</button>
-    <p id="r_msg" class="msg"></p>
-  </div>
+    <div class="logo">🙂</div>
+    <h1>얼굴인식</h1>
+    <p class="desc">로그인하면 실행 키를 받을 수 있어요</p>
 
-  <div class="card">
-    <h2>로그인</h2>
-    <input id="l_email" placeholder="이메일" autocomplete="off">
-    <input id="l_pw" type="password" placeholder="비밀번호">
-    <button class="primary" onclick="doLogin()">로그인</button>
-    <p id="l_msg" class="msg"></p>
-    <div id="key_box" style="display:none">
-      <b>내 키</b> — 아래 키를 복사해 프로그램에 입력하세요.
-      <textarea id="key_out" rows="2" readonly></textarea>
-      <button class="ghost" onclick="copyKey()">키 복사</button>
+    <div class="tabs">
+      <div class="tab active" id="tab_login" onclick="switchTab('login')">로그인</div>
+      <div class="tab" id="tab_register" onclick="switchTab('register')">회원가입</div>
     </div>
+
+    <form id="form_login" class="active">
+      <label>이메일</label>
+      <input id="l_email" placeholder="you@example.com" autocomplete="off">
+      <label>비밀번호</label>
+      <input id="l_pw" type="password" placeholder="비밀번호">
+      <button type="button" class="primary" onclick="doLogin()">로그인</button>
+      <p id="l_msg" class="msg"></p>
+      <div id="key_box" style="display:none">
+        <div class="lbl">🔑 내 키 — 복사해서 프로그램에 붙여넣으세요</div>
+        <textarea id="key_out" rows="2" readonly></textarea>
+        <button type="button" class="ghost" onclick="copyKey()">키 복사하기</button>
+      </div>
+    </form>
+
+    <form id="form_register">
+      <label>이메일</label>
+      <input id="r_email" placeholder="you@example.com" autocomplete="off">
+      <label>비밀번호</label>
+      <input id="r_pw" type="password" placeholder="비밀번호">
+      <button type="button" class="primary" onclick="doRegister()">회원가입</button>
+      <p id="r_msg" class="msg"></p>
+    </form>
   </div>
 
 <script>
+function switchTab(name) {
+  const login = name === 'login';
+  document.getElementById('tab_login').classList.toggle('active', login);
+  document.getElementById('tab_register').classList.toggle('active', !login);
+  document.getElementById('form_login').classList.toggle('active', login);
+  document.getElementById('form_register').classList.toggle('active', !login);
+}
 async function doRegister() {
   const email = document.getElementById('r_email').value.trim();
   const pw = document.getElementById('r_pw').value;

@@ -10,9 +10,9 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from urllib import error, request
 
-# 로컬 테스트 기본값. 서버를 다른 곳에 올렸으면 이 주소만 바꾸세요.
-DEFAULT_SERVER_URL = "http://127.0.0.1:8000"
-DEFAULT_ADMIN_KEY = "dev-admin-key-change-me"
+# Render 배포 주소. 관리자 키는 Render 환경변수 ADMIN_KEY에 넣은 값과 같아야 함.
+DEFAULT_SERVER_URL = "https://face-auth-dfva.onrender.com"
+DEFAULT_ADMIN_KEY = ""
 
 TIMEOUT = 10
 

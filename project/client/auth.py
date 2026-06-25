@@ -3,8 +3,8 @@ import os
 
 import requests
 
-# CHANGE THIS to your Render URL after deploy, e.g. "https://my-auth.onrender.com"
-SERVER_URL = "http://127.0.0.1:8000"
+# Render deployment URL.
+SERVER_URL = "https://face-auth-dfva.onrender.com"
 
 # Key cached next to the user's home so a PyInstaller .exe can still write it.
 KEY_PATH = os.path.join(os.path.expanduser("~"), ".face_detection_key")
