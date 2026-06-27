@@ -7,8 +7,6 @@ import mediapipe as mp
 from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
 
-from login_ui import require_login
-
 # Absolute paths so PyInstaller .exe finds the weights regardless of cwd.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEIGHTS_DIR = os.path.join(BASE_DIR, "weights")
@@ -181,12 +179,5 @@ def run_webcam():
     cv2.destroyAllWindows()
 
 
-def main():
-    # Must pass login before webcam runs.
-    if not require_login():
-        return
-    run_webcam()
-
-
 if __name__ == "__main__":
-    main()
+    run_webcam()
