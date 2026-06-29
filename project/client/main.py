@@ -1,5 +1,7 @@
 import ctypes
 import os
+import shutil
+import sys
 
 import cv2
 import pyautogui
@@ -8,8 +10,50 @@ from mediapipe.tasks import python as mp_python
 from mediapipe.tasks.python import vision
 
 # Absolute paths so PyInstaller .exe finds the weights regardless of cwd.
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEIGHTS_DIR = os.path.join(BASE_DIR, "weights")
+
+
+def is_ascii_path(path):
+    try:
+        os.fsdecode(path).encode("ascii")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
+def opencv_weight_path(filename):
+    src = os.path.join(WEIGHTS_DIR, filename)
+    if not os.path.exists(src):
+        raise FileNotFoundError(src)
+
+    system_drive = os.environ.get("SystemDrive", "C:")
+    public_root = os.environ.get(
+        "PUBLIC",
+        os.path.join(system_drive + os.sep, "Users", "Public"),
+    )
+    cache_dirs = (
+        os.path.join(system_drive + os.sep, "Temp", "face_detect_weights"),
+        os.path.join(public_root, "Documents", "face_detect_weights"),
+    )
+
+    errors = []
+    for cache_dir in cache_dirs:
+        if not is_ascii_path(cache_dir):
+            continue
+
+        try:
+            os.makedirs(cache_dir, exist_ok=True)
+            dst = os.path.join(cache_dir, filename)
+            shutil.copy2(src, dst)
+            return dst
+        except OSError as exc:
+            errors.append(f"{cache_dir}: {exc}")
+
+    raise RuntimeError(
+        "Could not copy OpenCV weight to an ASCII-only path. "
+        + "; ".join(errors)
+    )
 
 
 def ctrl_space_pressed():
@@ -57,10 +101,10 @@ def count_fingers(lm):
 
 
 def run_webcam():
-    face_cascade = cv2.CascadeClassifier(os.path.join(WEIGHTS_DIR, "face.xml"))
+    face_cascade = cv2.CascadeClassifier(opencv_weight_path("face.xml"))
 
     yunet = cv2.FaceDetectorYN.create(
-        os.path.join(WEIGHTS_DIR, "face_detection_yunet_2023mar.onnx"),
+        opencv_weight_path("face_detection_yunet_2023mar.onnx"),
         "",
         (320, 320),
         score_threshold=0.6,
